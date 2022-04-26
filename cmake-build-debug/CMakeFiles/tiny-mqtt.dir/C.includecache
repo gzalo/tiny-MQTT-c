@@ -1,0 +1,34 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+C:/Users/Gzalo/Desktop/github/tiny-MQTT-c/client.h
+stdint.h
+-
+time.h
+-
+
+C:/Users/Gzalo/Desktop/github/tiny-MQTT-c/client_test.c
+client.h
+C:/Users/Gzalo/Desktop/github/tiny-MQTT-c/client.h
+assert.h
+-
+stdio.h
+-
+stdlib.h
+-
+unistd.h
+-
+signal.h
+-
+mqtt.h
+C:/Users/Gzalo/Desktop/github/tiny-MQTT-c/mqtt.h
+
+C:/Users/Gzalo/Desktop/github/tiny-MQTT-c/mqtt.h
+stdint.h
+-
+

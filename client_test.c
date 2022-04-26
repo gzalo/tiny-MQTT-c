@@ -6,16 +6,16 @@
 #include <signal.h>
 #include "mqtt.h"
 
-int keepalive_sec = 4;
+int keepalive_sec = 1;
 client_t c;
 char buffer[BUFFER_SIZE_BYTES];
 uint8_t buf[128];
 int nbytes;
-int is_subscriber = 1;
+int is_subscriber = 0;
 
 static void got_connection(client_t* psClnt)
 {
-  require(psClnt != 0);
+  assert(psClnt != 0);
 
   printf("CLNT%d: connected to server.\n", psClnt->sockfd);
 
@@ -29,14 +29,14 @@ static void got_connection(client_t* psClnt)
 
 static void lost_connection(client_t* psClnt)
 {
-  require(psClnt != 0);
+  assert(psClnt != 0);
 
   printf("CLNT%d: disconnected from server.\n", psClnt->sockfd);
 }
 
 static void got_data(client_t* psClnt, unsigned char* data, int nbytes)
 {
-  require(psClnt != 0);
+  assert(psClnt != 0);
 
   printf("CLNT%d: got %d bytes (", psClnt->sockfd, nbytes);
 
@@ -98,37 +98,44 @@ void inthandler(int dummy)
 
 int main(int argc, char* argv[])
 {
-  (void) argv;
-  is_subscriber = (argc == 1);
-  printf("client, %s\n", (is_subscriber ? "subscriber" : "publisher"));
 
-  client_init(&c, "test.mosquitto.org", 1883, buffer, BUFFER_SIZE_BYTES);
+  client_init(&c, "192.168.0.20", 1883, buffer, BUFFER_SIZE_BYTES);
   //client_init(&c, "mqtt.fluux.io", 1883, buffer, BUFFER_SIZE_BYTES);
 
   assert(client_set_callback(&c, CB_RECEIVED_DATA, got_data)        == 1);
   assert(client_set_callback(&c, CB_ON_CONNECTION, got_connection)  == 1);
   assert(client_set_callback(&c, CB_ON_DISCONNECT, lost_connection) == 1);
 
-  signal(SIGINT, inthandler);
+  //signal(SIGINT, inthandler);
 
   const time_t ping_interval = (keepalive_sec - 1);
   int subscribed = 0;
-  time_t next_pub = time(0) + 10;
+  time_t next_pub = time(0) + 2;
   time_t next_ping = time(0) + ping_interval;
 
   char buf2[1024];
   int nbytes;
+
+  client_connect(&c);
+  client_poll(&c, 0);
+
+  nbytes = mqtt_encode_publish_msg((uint8_t*)buf2, (uint8_t*)"cmnd/sonoff-4/power", 19, 1, 10, (uint8_t*)"0", 1);
+  client_send(&c, buf2, nbytes);
+    client_poll(&c, 0);
+
+  return 0;
+
   while (1)
   {
     client_poll(&c, 0);
 
-    if (is_subscriber && !subscribed && ((time(0) - c.last_active) >= 2))
+    /*if (is_subscriber && !subscribed && ((time(0) - c.last_active) >= 2))
     {
       nbytes = mqtt_encode_subscribe_msg((uint8_t*)buf2, (uint8_t*)"a/b", 3, 1, 12345);
       client_send(&c, buf2, nbytes);
       subscribed = 1;
       client_poll(&c, 0);
-    }
+    }*/
 
     if ((time(0) ) >= next_ping)
     {

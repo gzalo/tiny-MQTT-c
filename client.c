@@ -7,12 +7,15 @@
 #include <errno.h>
 #include <signal.h>
 #include <sys/types.h>
+#include <unistd.h>
+#ifdef WIN32
+#include <winsock2.h>
+#else
 #include <sys/socket.h>
 #include <sys/ioctl.h>
-#include <unistd.h>
 #include <netinet/in.h>
 #include <netdb.h>
-
+#endif
 
 /* Helper functions: */
 static void _dummy_connect  (client_t* s, int f, const char* b)  { (void) s; (void) f; (void) b; }
@@ -20,7 +23,7 @@ static void _dummy_recv_data(client_t* s, int f, char* d, int l) { (void) s; (vo
 
 static void _change_state(client_t* psClnt, conn_state_t new_state)
 {
-  require(psClnt != 0);
+  assert(psClnt != 0);
 
   psClnt->state = new_state;
   psClnt->last_active = time(0);
@@ -34,11 +37,22 @@ static void _change_state(client_t* psClnt, conn_state_t new_state)
 
 void client_init(client_t* psClnt, char* dst_addr, uint16_t dst_port, char* rxbuf, uint32_t rxbufsize)
 {
-  require(psClnt != 0);
-  require(dst_addr != 0);
-  require(rxbuf != 0);
+  assert(psClnt != 0);
+  assert(dst_addr != 0);
+  assert(rxbuf != 0);
 
-  strcpy(psClnt->addr, dst_addr);
+#ifdef WIN32
+    WSADATA wsaData;
+    int iResult;
+
+// Initialize Winsock
+    iResult = WSAStartup(MAKEWORD(2,2), &wsaData);
+    if (iResult != 0) {
+        printf("WSAStartup failed: %d\n", iResult);
+    }
+#endif
+
+    strcpy(psClnt->addr, dst_addr);
   psClnt->port = dst_port;
   psClnt->sockfd = 0;
   psClnt->rxbuf   = rxbuf;
@@ -47,32 +61,13 @@ void client_init(client_t* psClnt, char* dst_addr, uint16_t dst_port, char* rxbu
   psClnt->client_disconnected = (void*)_dummy_connect;
   psClnt->client_new_data     = (void*)_dummy_recv_data;
 
-  /*
-     Set the socket I/O mode: In this case FIONBIO  
-     enables or disables the blocking mode for the   
-     socket based on the numerical value of iMode.  
-     If iMode = 0, blocking is enabled;   
-     If iMode != 0, non-blocking mode is enabled.
-  */
-  int iMode = 0;
-  ioctl(psClnt->sockfd, FIONBIO, &iMode);
-
-  /*
-  // WINDOWS
-  DWORD timeout = SOCKET_READ_TIMEOUT_SEC * 1000;
-  setsockopt(socket, SOL_SOCKET, SO_RCVTIMEO, (const char*)&timeout, sizeof(timeout));
-  */
-
   _change_state(psClnt, CREATED);
-
-  /* Ignore SIGPIPE - "broken pipe" / disconnected socket */
-  signal(SIGPIPE, SIG_IGN);
 }
 
 int client_set_callback(client_t* psClnt, cb_type eTyp, void* funcptr)
 {
-  require(psClnt != 0);
-  require(funcptr != 0);
+  assert(psClnt != 0);
+  assert(funcptr != 0);
 
   int success = 1;
 
@@ -89,8 +84,8 @@ int client_set_callback(client_t* psClnt, cb_type eTyp, void* funcptr)
 
 int client_send(client_t* psClnt, char* data, uint32_t nbytes)
 {
-  require(psClnt != 0);
-  require(data != 0);
+  assert(psClnt != 0);
+  assert(data != 0);
 
   psClnt->last_active = time(0);
   printf("CLNT%u: sending %u bytes.\n", psClnt->sockfd, nbytes);
@@ -108,7 +103,7 @@ int client_send(client_t* psClnt, char* data, uint32_t nbytes)
 
 int client_recv(client_t* psClnt, uint32_t timeout_us)
 {
-  require(psClnt != 0);
+  assert(psClnt != 0);
 
   struct timeval tv;
   tv.tv_sec = 0;
@@ -124,9 +119,9 @@ int client_recv(client_t* psClnt, uint32_t timeout_us)
   if (nbytes <= 0)
   {
     /* got error or connection closed by server? */
-    if (    (nbytes == -1)           /* nothing for us  */
-         || (nbytes == EAGAIN)       /* try again later */
-         || (nbytes == EWOULDBLOCK)) /* same as above   */
+    if (    (nbytes == 0)   )        /* nothing for us  */
+         //|| (nbytes == EAGAIN))       /* try again later */
+         //|| (nbytes == WSAEWOULDBLOCK)) /* same as above   */
     {
       /* do nothing */
     }
@@ -134,7 +129,7 @@ int client_recv(client_t* psClnt, uint32_t timeout_us)
     {
       /* connection lost / reset by peer */
       perror("recv");
-      client_disconnect(psClnt);
+    client_disconnect(psClnt);
     }
   }
   else
@@ -155,7 +150,7 @@ void client_poll(client_t* psClnt, uint32_t timeout_us)
   /* 10usec timeout is a reasonable minimum I think */
   timeout_us = ((timeout_us >= 10) ? timeout_us : 10);
 
-  require(psClnt != 0);
+  assert(psClnt != 0);
 
   switch (psClnt->state)
   {
@@ -192,10 +187,16 @@ void client_poll(client_t* psClnt, uint32_t timeout_us)
 
 void client_disconnect(client_t* psClnt)
 {
-  require(psClnt != 0);
+  assert(psClnt != 0);
 
+#if WIN32
+    closesocket(psClnt->sockfd);
+#else
   shutdown(psClnt->sockfd, 2);
   close(psClnt->sockfd);
+#endif
+
+  printf("DISSSCONECTED");
 
   _change_state(psClnt, DISCONNECTED);
   psClnt->client_disconnected(psClnt);
@@ -203,7 +204,7 @@ void client_disconnect(client_t* psClnt)
 
 int client_connect(client_t* psClnt)
 {
-  require(psClnt != 0);
+  assert(psClnt != 0);
 
   int success = 0;
 

@@ -1,0 +1,7 @@
+
+B	cpp:S3642"&Replace this "enum" with "enum class".(Ì——œ8Ë¤”ä/
+W	cpp:S5416";"using" should be preferred to "typedef" for type aliasing.(Ì——œ8Ë¤”ä/
+B	cpp:S3642"&Replace this "enum" with "enum class".(Ì——œ8Ë¤”ä/
+W	cpp:S5416";"using" should be preferred to "typedef" for type aliasing.(Ì——œ8‘Ë¤”ä/
+N	cpp:S5945"2Use "std::string" instead of a C-style char array.(Á†˜Š8‘Ë¤”ä/
+\	cpp:S5416";"using" should be preferred to "typedef" for type aliasing.(áÎË„şÿÿÿÿ8‘Ë¤”ä/

@@ -1,12 +1,7 @@
 #include <stdint.h>
 #include <time.h>
 
-#define NCONNECTIONS               1
 #define BUFFER_SIZE_BYTES          1024
-
-/* Assertion macro */
-#define require(predicate)         assert((predicate))
-
 
 /* Socket connection state */
 typedef enum

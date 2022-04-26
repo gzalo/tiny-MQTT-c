@@ -1,0 +1,22 @@
+
+@c:S1103{"&Remove the misleading "/*" characters.(ã›í†8†úÍ”ä/
+@c:S1103|"&Remove the misleading "/*" characters.(×Ñ¨ï8Åóè”ä/
+Fc:CommentedCode¦"Remove the commented out code.(±³ñşÿÿÿÿ8ÉÏ©”ä/
+Ac:CommentedCode©"Remove the commented out code.(¡‡Çá8ÉÏ©”ä/
+ic:S995"PMake this parameter a pointer-to-const. The current type of "s" is "client_t *".(²ı½µ8œ½¥”ä/
+ic:S995"PMake this parameter a pointer-to-const. The current type of "s" is "client_t *".(¨‡Ã8Ô¥”ä/
+ec:S995"LMake this parameter a pointer-to-const. The current type of "d" is "char *".(¨‡Ã8Ô¥”ä/
+qc:S995&"SMake this parameter a pointer-to-const. The current type of "dst_addr" is "char *".(ëææûÿÿÿÿ8´Ğ§”ä/
+nc:S936<"PEither add a parameter list or the "&" operator to this use of "_dummy_connect".(”ù—ğøÿÿÿÿ8´Ğ§”ä/
+nc:S936="PEither add a parameter list or the "&" operator to this use of "_dummy_connect".(÷«Äñøÿÿÿÿ8´Ğ§”ä/
+pc:S936>"REither add a parameter list or the "&" operator to this use of "_dummy_recv_data".(úÒÅµşÿÿÿÿ8´Ğ§”ä/
+hc:S995U"OMake this parameter a pointer-to-const. The current type of "data" is "char *".(â†®©8°Ğ©”ä/
+;c:S1110z"!Remove these useless parentheses.(‰å„ß8ÿ‘é”ä/
+oc:S995"UMake this parameter a pointer-to-const. The current type of "psClnt" is "client_t *".(ÿ•‹†8²Ğ©”ä/
+]c:SwitchWithoutDefault›".Add a "default" case to this switch statement.(¨ÑÏÌùÿÿÿÿ8³Ğ©”ä/
+Vc:S1199"6Extract this nested code block into a separate method.(ÒÌâ–øÿÿÿÿ8ºĞ§”ä/
+Vc:S1199£"6Extract this nested code block into a separate method.(ÒÌâ–øÿÿÿÿ8³Ğ©”ä/
+Vc:S1199°"6Extract this nested code block into a separate method.(ÒÌâ–øÿÿÿÿ8³Ğ©”ä/
+c:S5350Ô"fMake the type of this variable a pointer-to-const. The current type of "server" is "struct hostent *".(ŒÍ€ö8İâ”ä/
+c:NonReentrantFunctionİ"_Replace this call to the non reentrant function "gethostbyname" by a call to "gethostbyname_r".( æèéıÿÿÿÿ8İâ”ä/
+Œc:ObsoletePosixFunctionİ"\Remove use of this obsolete "gethostbyname" function. Replace it by a call to "getaddrinfo".( æèéıÿÿÿÿ8İâ”ä/
